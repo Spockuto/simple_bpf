@@ -17,7 +17,7 @@ use std::ffi::CStr;
 use std::thread::sleep;
 use std::time::Duration;
 
-const MONITORED_FILE: &str = "/home/venky/cv_debug.log";
+const MONITORED_FILE: &str = "cv_debug.log";
 
 #[repr(C)]
 struct Event {
@@ -48,7 +48,7 @@ fn handle_buffer(data: &[u8]) -> i32 {
     let c_str: &CStr = unsafe { CStr::from_ptr(event.comm.as_ptr()) };
     let comm = c_str.to_str().expect("Failed to convert to str");
 
-    if filename == MONITORED_FILE {
+    if filename.contains(MONITORED_FILE) {
         println!(
             "Process {:?} with PID = {:?} accessed {:?}",
             comm, event.pid, filename
