@@ -1,25 +1,28 @@
-mod execve {
+mod openat {
     include!(concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/src/bpf/execve.skel.rs"
+        "/src/bpf/openat.skel.rs"
     ));
 }
-use execve::*;
+use openat::*;
 
 use libbpf_rs::skel::OpenSkel;
 use libbpf_rs::skel::Skel;
 use libbpf_rs::skel::SkelBuilder;
 use libbpf_rs::MapHandle;
 use libbpf_rs::RingBufferBuilder;
-use libc::c_char;
 use plain::Plain;
+use std::ffi::c_char;
 use std::ffi::CStr;
 use std::thread::sleep;
 use std::time::Duration;
 
+const MONITORED_FILE: &str = "/home/venky/cv_debug.log";
+
 #[repr(C)]
 struct Event {
     pid: i32,
+    comm: [c_char; 16],
     filename: [c_char; 512],
 }
 
@@ -27,6 +30,7 @@ impl Default for Event {
     fn default() -> Self {
         Self {
             pid: 0,
+            comm: [0; 16],
             filename: [0; 512],
         }
     }
@@ -41,12 +45,21 @@ fn handle_buffer(data: &[u8]) -> i32 {
     let c_str: &CStr = unsafe { CStr::from_ptr(event.filename.as_ptr()) };
     let filename = c_str.to_str().expect("Failed to convert to str");
 
-    println!("PID = {:?} and filename={:?}", event.pid, filename);
+    let c_str: &CStr = unsafe { CStr::from_ptr(event.comm.as_ptr()) };
+    let comm = c_str.to_str().expect("Failed to convert to str");
+
+    if filename == MONITORED_FILE {
+        println!(
+            "Process {:?} with PID = {:?} accessed {:?}",
+            comm, event.pid, filename
+        );
+    }
+
     0
 }
 
 fn main() {
-    let skel_builder = ExecveSkelBuilder::default();
+    let skel_builder = OpenatSkelBuilder::default();
     let open_skel = skel_builder.open().unwrap();
 
     let mut skel = open_skel.load().unwrap();

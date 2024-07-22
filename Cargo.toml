@@ -8,5 +8,4 @@ libbpf-cargo = "0.23.3"
 
 [dependencies]
 libbpf-rs = "0.23.3"
-libc = "0.2.155"
 plain = "0.2.3"

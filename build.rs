@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use libbpf_cargo::SkeletonBuilder;
 
-const SRC: &str = "src/bpf/execve.bpf.c";
+const SRC: &str = "src/bpf/openat.bpf.c";
 
 fn main() {
     let out = PathBuf::from(
@@ -12,7 +12,7 @@ fn main() {
     )
     .join("src")
     .join("bpf")
-    .join("execve.skel.rs");
+    .join("openat.skel.rs");
 
     SkeletonBuilder::new()
         .source(SRC)

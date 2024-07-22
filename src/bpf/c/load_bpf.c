@@ -4,19 +4,20 @@
 
 struct event {
     __u32 pid;
+    char comm[16];
     char filename[512];
 };
 
 static int event_logger(void* ctx, void* data, size_t len) {
     struct event* evt = (struct event*)data;
-    printf("PID = %d and filename=%s\n", evt->pid, evt->filename);
+    printf("Process %s with PID = %d accessed %s\n", evt->comm, evt->pid, evt->filename);
     return 0;
 }
 
 int main() {
-    const char* filename = "execve.bpf.o";
+    const char* filename = "openat.bpf.o";
     const char* mapname = "ringbuf";
-    const char* progname = "detect_execve";
+    const char* progname = "detect_openat";
     struct bpf_object* bpfObject = bpf_object__open(filename);
     if (!bpfObject) {
         printf("Failed to open %s\n", filename);
