@@ -17,7 +17,6 @@ use std::ffi::CStr;
 use std::thread::sleep;
 use std::time::Duration;
 
-
 #[repr(C)]
 struct Event {
     pid: i32,
@@ -52,7 +51,7 @@ fn main() {
 
     let mut skel = open_skel.load().unwrap();
     skel.attach().unwrap();
-    
+
     let maps = skel.maps();
     let ring_buf_map = maps.ringbuf();
     let map_handle = MapHandle::try_clone(&ring_buf_map).unwrap();
